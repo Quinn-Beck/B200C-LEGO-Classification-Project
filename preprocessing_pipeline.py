@@ -10,7 +10,7 @@ from torch.utils.data import TensorDataset
 
 # TODO: Get normalizer working and include to_tensor OR normalizer param for normalization
 # across_classes = False -> use to_tensor
-def get_data(num_classes=2):
+def get_data(num_classes=10):
     """
     Load processed images for model training and evaluation.
     
@@ -39,7 +39,7 @@ def get_data(num_classes=2):
     # iterate over class folders
     for (iter, folder) in enumerate(jpgfolders):
         print(f"Opening folder {iter}")
-        if iter > 1:
+        if iter > (num_classes - 1):
             break
         
         # initialize storage for imported images and their class labels
