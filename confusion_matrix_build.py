@@ -10,7 +10,8 @@ def confusion_plot(model, data):
     for i, (images, labels) in enumerate(data):
         images = images.to(device)
         labels = labels.to(device)
-        
+
+        model.eval()
         x = model(images)
         value, pred = torch.max(x, 1)
         
