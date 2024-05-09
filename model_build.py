@@ -18,13 +18,18 @@ transform = v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)])
 num_classes = 10
 
 # --- SOME HYPERPARAMETERS ---
+batch_size = [32,64]
 num_workers = [0,1,2,3]
-num_epochs = 5
+prefetch = [2,3,4]
 learn_rate = 1e-4
+num_epochs = 5
 
 # --- LOAD DATA ---
 train_data, val_data, test_data = data_generator(num_classes, transform)
 
+train_dl = DataLoader(train_data, batch_size, shuffle=True, num_workers, prefetch_factor=prefetch)
+val_dl = DataLoader(val_data, batch_size, shuffle=True, num_workers, prefetch_factor=prefetch)
+test_dl = DataLoader(test_data, batch_size, shuffle=True, num_workers, prefetch_factor=prefetch)
 
 
 # --- INSTANTIATE / LOAD MODEL ---
