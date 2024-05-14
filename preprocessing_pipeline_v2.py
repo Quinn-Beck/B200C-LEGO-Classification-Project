@@ -2,11 +2,11 @@ import PIL
 from torch.utils.data import Subset
 from torchvision.datasets import ImageFolder
 
-def data_generator(num_classes = 10, t):
+def data_generator(t, num_classes = 10):
     """
     Prepare images for batch streaming.
     """
-    full_data = ImageFolder(root = "C:/Users/Quinn/Desktop/B200C-Lego-Classification/64/*",
+    full_data = ImageFolder(root = "C:/Users/Quinn/Desktop/B200C-Lego-Classification/64",
                             transform = t, loader = PIL.Image)
     
     # get indices to slice the full dataset on to separate training, validation, and testing data
