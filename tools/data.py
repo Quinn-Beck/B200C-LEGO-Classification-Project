@@ -2,7 +2,7 @@ import PIL
 from torch.utils.data import Subset
 from torchvision.datasets import ImageFolder
 
-def data_generator(train_t, eval_t, num_classes = 10):
+def data_generator(train_t, eval_t, num_classes = 200):
     """
     Prepare images for batch streaming.
     """

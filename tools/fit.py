@@ -1,8 +1,11 @@
 import torch
+from sklearn.metrics import top_k_accuracy_score, precision_score, recall_score, f1_score
 
-def train(model, dataloader, optimizer, loss_fn):
+def train(model, device, dataloader, optimizer, loss_fn):
+    model = model.to(device)
     model.train()
     counter = 0
+    
     train_running_loss = 0.0
     correct = 0
     total = len(dataloader.dataset)
@@ -29,7 +32,9 @@ def train(model, dataloader, optimizer, loss_fn):
     
     return epoch_loss, epoch_acc
 
-def test(model, dataloader, loss_fn):
+# TODO: include top-k accuracy
+def test(model, device, dataloader, loss_fn):
+    model = model.to(device)
     model.eval()
     counter = 0
     correct = 0
@@ -47,14 +52,14 @@ def test(model, dataloader, loss_fn):
             
             y = model(images)
             loss = loss_fn(y, labels)
-            val_running_loss += loss.item()
+            test_running_loss += loss.item()
             
             values, preds = torch.max(y, 1)
             # count correctly classified images
             correct += torch.sum(preds == labels)
 
             # Collect all targets and predictions for metric calculations
-            all_labels.extend(labels.view_as(predicted).cpu().numpy())
+            all_labels.extend(labels.view_as(preds).cpu().numpy())
             all_preds.extend(preds.cpu().numpy())
 
     # Calculate overall metrics
@@ -68,7 +73,10 @@ def test(model, dataloader, loss_fn):
     
     return test_loss, accuracy, precision, recall, f1
 
-def validate(model, dataloader, loss_fn):
+# TODO: include top-k accuracy as objective function
+# TODO: for hyperparameter tuning
+def validate(model, device, dataloader, loss_fn):
+    model = model.to(device)
     model.eval()
     counter = 0
     val_running_loss = 0.0
