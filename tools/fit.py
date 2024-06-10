@@ -1,7 +1,7 @@
 import torch
 from sklearn.metrics import top_k_accuracy_score, precision_score, recall_score, f1_score
 
-def train(model, device, dataloader, optimizer, loss_fn):
+def train(model, device, dataloader, optimizer, criterion):
     model = model.to(device)
     model.train()
     counter = 0
@@ -16,7 +16,7 @@ def train(model, device, dataloader, optimizer, loss_fn):
         labels = labels.to(device)
         
         y = model(images)
-        loss = loss_fn(y, labels)
+        loss = criterion(y, labels)
         train_running_loss += loss.item()
         
         values, preds = torch.max(y, 1)
@@ -33,7 +33,7 @@ def train(model, device, dataloader, optimizer, loss_fn):
     return epoch_loss, epoch_acc
 
 # TODO: include top-k accuracy
-def test(model, device, dataloader, loss_fn):
+def test(model, device, dataloader, criterion):
     model = model.to(device)
     model.eval()
     counter = 0
@@ -51,27 +51,33 @@ def test(model, device, dataloader, loss_fn):
             labels = labels.to(device)
             
             y = model(images)
-            loss = loss_fn(y, labels)
+            loss = criterion(y, labels)
             test_running_loss += loss.item()
             
             values, preds = torch.max(y, 1)
             # count correctly classified images
-            correct += torch.sum(preds == labels)
+            correct += torch.sum(preds == labels).item()
 
             # Collect all targets and predictions for metric calculations
             all_labels.extend(labels.view_as(preds).cpu().numpy())
             all_preds.extend(preds.cpu().numpy())
+            
+            if i == 0:
+                all_ys = y.cpu()
+            else:
+                all_ys = torch.cat([all_ys, y.cpu()])
 
     # Calculate overall metrics
     precision = precision_score(all_labels, all_preds, average='macro')
     recall = recall_score(all_labels, all_preds, average='macro')
     f1 = f1_score(all_labels, all_preds, average='macro')
+    top_3 = top_k_accuracy_score(all_labels, all_ys, k=3)
     
     # test loss and accuracy for the epoch
     test_loss = test_running_loss / counter
-    accuracy = 100.0 * (correct / total)
+    accuracy = correct / total
     
-    return test_loss, accuracy, precision, recall, f1
+    return test_loss, accuracy, precision, recall, f1, top_3
 
 # TODO: include top-k accuracy as objective function
 # TODO: for hyperparameter tuning
